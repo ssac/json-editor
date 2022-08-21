@@ -1,6 +1,6 @@
 {
   "name": "@ssac/json-editor",
-  "version": "1.0.0",
+  "version": "1.0.2",
   "description": "Utilities to manipulate .json file.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",

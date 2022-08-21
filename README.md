@@ -137,6 +137,29 @@ Output:
 |Sue|_**M**_|16|
 
 
+#### Handle complex json structure
+What if a json file looks like this, you only want to handle `list` property.
+```
+{
+    "version": 10,
+    "list": [ ... ]
+}
+```
+
+Pass parse options like below, instruct helper to extract the rows and rebuild the json file to be written.
+```
+import Collection from '@ssac/json-editor';
+
+const helper = new Collection({
+    ...,
+    parseOpts: {
+        extractRows: jsonObj => jsonObj.list,
+        rebuild: (jsonObj, rows) => ({...jsonObj, list: rows})
+    }
+})
+```
+
+
 ## API docs
 ### `DbLike` Class
 This is a class to handle a list of object with unique ID.

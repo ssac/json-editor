@@ -6,7 +6,7 @@ export interface DbLikeOpts<K> {
   idField: K;
 }
 
-export interface DbLikeArgs<K> extends ParserOpts {
+export interface DbLikeArgs<K, T> extends ParserOpts<T> {
   dbLikeOpts: DbLikeOpts<K>;
 }
 
@@ -22,7 +22,7 @@ export type RowWithId<K extends string> = {
 export default class<K extends string, T extends RowWithId<K>> extends Collection<T> {
   private opts: DbLikeOpts<K>;
 
-  constructor(args: DbLikeArgs<K>) {
+  constructor(args: DbLikeArgs<K, T>) {
     super({
       fileOpts: args.fileOpts,
       parserOpts: args.parserOpts,

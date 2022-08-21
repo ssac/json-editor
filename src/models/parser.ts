@@ -1,32 +1,57 @@
-import File from './file';
+import * as _ from 'lodash';
 
-import type { FileOpts } from './file';
+import { default as File, FileOpts } from './file';
 
 type JsonValuePrimitive = string | number | object | boolean;
 export type JsonValue = JsonValuePrimitive | JsonValuePrimitive[];
 
-interface Options {}
-
-export interface ParserOpts {
-  fileOpts: FileOpts;
-  parserOpts?: Options;
+interface Options<T> {
+  extractRows?: (jsonObj: object) => T[];
+  rebuild?: (oriJsonObj: object, rows: T[]) => object;
 }
 
-const DEFAULT_OPTS: Options = {};
+export interface ParserOpts<T> {
+  fileOpts: FileOpts;
+  parserOpts?: Options<T>;
+}
 
 export default class<T> extends File {
-  private parserOpts: Options;
+  private parserOpts: Options<T>;
+  private originalData: object;
 
-  constructor(args: ParserOpts) {
+  constructor(args: ParserOpts<T>) {
     super(args.fileOpts);
-    this.parserOpts = args.parserOpts ? { ...DEFAULT_OPTS, ...args.parserOpts } : DEFAULT_OPTS;
+    this.parserOpts = args.parserOpts || {};
   }
 
   public async parseFile(): Promise<T[]> {
-    return JSON.parse(this.read());
+    const original = JSON.parse(this.read());
+    this.originalData = original;
+
+    if (!this.parserOpts?.extractRows) {
+      if (!_.isArray(original)) {
+        throw new Error(`Parsed data is not an array.`);
+      }
+
+      return original;
+    }
+
+    const extracted = this.parserOpts.extractRows(original);
+
+    if (!_.isArray(extracted)) {
+      throw new Error(`Extracted data is not an array.`);
+    }
+
+    return extracted;
   }
 
   public async writeFile(rows: T[]) {
-    return this.write(JSON.stringify(rows));
+    let outputData: T[] | object = rows;
+
+    if (this.parserOpts?.rebuild) {
+      outputData = this.parserOpts.rebuild(this.originalData, rows);
+    }
+
+    return this.write(JSON.stringify(outputData));
   }
 }

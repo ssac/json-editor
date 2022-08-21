@@ -1,0 +1,15 @@
+{
+	"name": "test",
+	"list": [
+		{
+			"name": "Peter",
+			"sex": "M",
+			"age": 18
+		},
+		{
+			"name": "Sue",
+			"sex": "F",
+			"age": 16
+		}
+	]
+}
